@@ -17,7 +17,7 @@
   <h3 align='center'>Description</h3>
   <hr/>
   <ul>
-    <li>Leverages Python's built-in calendar module and a minimalist UI to track small improvements over time.</li>
-    <li>Allows users to create accounts and manage their habits.</li>
+    <li>Leverages Python's built-in calendar module and a minimalist UI to track small improvements in habits over time.</li>
+    <li>Allows users to create accounts to manage their habits.</li>
   </ul>
 </div>
