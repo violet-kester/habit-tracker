@@ -3,8 +3,22 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 
 
+class Profile(models.Model):
+    """
+    A model class that extends Django's User model.
+
+    Has a one-to-one relationship with the User model.
+    Stores additional data about the user.
+    """
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    habits = models.ManyToManyField('Habit', related_name='habits')
+
+
 class Habit(models.Model):
-    """A model class that represents a habit to track."""
+    """
+    A model class that represents a habit to track.
+    """
 
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250,
