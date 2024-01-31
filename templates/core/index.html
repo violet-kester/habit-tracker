@@ -4,6 +4,13 @@
 
 {% block main %}
 
-Homepage.
+<h1>Habit Tracker</h1>
 
-{% endmain %}
+<p>Welcome, {{ user.username }}.</p>
+<p>Here are your habits and progress for {{ month }} {{ year }}:</p>
+
+<div class="calendar">
+    {{ html_cal|safe }}
+</div>
+
+{% endblock %}
