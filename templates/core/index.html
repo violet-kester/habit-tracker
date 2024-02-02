@@ -1,16 +1,24 @@
 {% extends base_template %}
 
-{% block title %}Habit Tracker - User - Home{% endblock %}
+{% block title %}
+{% if user.is_authenticated %}
+Habit Tracker - {{ user.first_name }} {{ user.last_name }} - Login
+{% else %}
+Habit Tracker - Login
+{% endif %}
+{% endblock %}
+
+{% block header %}<h1>Habit Tracker</h1>{% endblock %}
 
 {% block main %}
-
-<h1>Habit Tracker</h1>
-
-<p>Welcome, {{ user.username }}.</p>
-<p>Here are your habits and progress for {{ month_name }} {{ year }}:</p>
-
-<div class="calendar">
-    {{ html_cal|safe }}
-</div>
-
+<section>
+    <h2>Progress</h2>
+    <p>
+        Welcome{% if user.is_authenticated %}, {{ user.first_name }} {{ user.last_name }}{% endif %}.<br />
+        Here are your habits and progress for {{ month_name }} {{ year }}:
+    </p>
+    <div class="calendar">
+        {{ html_cal|safe }}
+    </div>
+</section>
 {% endblock %}
