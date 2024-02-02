@@ -1,4 +1,5 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 import calendar
 import datetime
@@ -84,11 +85,11 @@ def homepage(request):
     # Format the month as an HTML table
     html_cal = cal.formatmonth(year, month)
 
-    # Determine the base template to use based on the request type
+    # Determine which base template to extend from based on the request type
     if request.htmx:
-        base_template = "_partial.html"
+        base_template = '_partial.html'
     else:
-        base_template = "_base.html"
+        base_template = '_base.html'
 
     context = {
         'habits': habits,
@@ -105,24 +106,64 @@ def homepage(request):
     )
 
 
-def login(request):
+def user_login(request):
     """
     Login view.
+
+    - For POST requests, it authenticates and logs in the user,
+      then redirects them to the homepage.
+    - Otherwise, it renders the login page with an AuthenticationForm.
+
+    Context variables:
+        - `form` - The AuthenticationForm instance.
+        - `base_template` - The base template to extend from,
+           depending on whether the request type is htmx or not.
     """
 
-    username = request.POST["username"]
-    password = request.POST["password"]
-    user = authenticate(request, username=username, password=password)
-
-    if user is not None:
-        login(request, user)
-        # Redirect to the homepage
-        return redirect("core:index")
+    # Authenticate and login the user for POST requests
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('core:homepage')
+    # Return a blank AuthenticationForm for other requests
     else:
-        # Return an error message
-        # messages.error(request, "Login failed.")
-        return render(
-            request,
-            'core/index.html',
-            {}
-        )
+        form = AuthenticationForm()
+
+    # Determine which base template to extend from based on the request type
+    if request.htmx:
+        base_template = '_partial.html'
+    else:
+        base_template = '_base.html'
+
+    context = {
+        'form': form,
+        'base_template': base_template,
+    }
+    return render(request, 'core/login.html', context)
+
+
+def user_logout(request):
+    """
+    Logout view.
+    """
+
+    logout(request)
+    return redirect('core:homepage')
+
+
+def user_register(request):
+    """
+    Register view.
+    """
+
+    pass
+
+
+def dashboard(request):
+    """
+    Dashboard view.
+    """
+
+    pass
