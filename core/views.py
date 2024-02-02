@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
 import calendar
 import datetime
 from .models import Habit, Progress
@@ -102,3 +103,26 @@ def homepage(request):
         'core/index.html',
         context
     )
+
+
+def login(request):
+    """
+    Login view.
+    """
+
+    username = request.POST["username"]
+    password = request.POST["password"]
+    user = authenticate(request, username=username, password=password)
+
+    if user is not None:
+        login(request, user)
+        # Redirect to the homepage
+        return redirect("core:index")
+    else:
+        # Return an error message
+        # messages.error(request, "Login failed.")
+        return render(
+            request,
+            'core/index.html',
+            {}
+        )
