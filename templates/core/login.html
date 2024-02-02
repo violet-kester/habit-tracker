@@ -1,0 +1,22 @@
+{% extends base_template %}
+
+{% block title %}
+  {% if user.is_authenticated %}
+    Habit Tracker - {{ user.first_name }} {{ user.last_name }} - Login
+  {% else %}
+    Habit Tracker - Login
+  {% endif %}
+{% endblock %}
+
+{% block header %}<h1>Login</h1>{% endblock %}
+
+{% block main %}
+<form
+  hx-post="{% url 'core:login' %}"
+  hx-target="#content"
+  hx-swap="innerHTML"
+  hx-push-url="true">
+  {{ form.as_p }}
+  <button type=" submit">Login</button>
+</form>
+{% endblock %}
