@@ -52,9 +52,8 @@ class Habit(models.Model):
 
 class Progress(models.Model):
     """
-    A model class that records the daily progress of a habit.
+    A model class that represents the completion status of a habit on a date.
 
-    - Associated with a single date.
     - Stores the completion status as a boolean value.
     - Has a many-to-one relationship with the Habit model.
     """
