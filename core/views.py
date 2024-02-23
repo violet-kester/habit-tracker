@@ -1,9 +1,12 @@
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 import calendar
 import datetime
 from .models import Habit, Progress
+from .forms import HabitForm
 
 
 def homepage(request):
@@ -104,6 +107,53 @@ def homepage(request):
         'core/index.html',
         context
     )
+
+
+@login_required
+def habit(request):
+    """
+    Habit view.
+
+    - For POST requests, it creates a new habit.
+    - Otherwise, it renders a form for adding a new habit.
+
+    Context variables:
+        - `form` - The AuthenticationForm instance.
+        - `base_template` - The base template to extend from,
+           depending on whether the request type is htmx or not.
+    """
+
+    # Authenticate and login the user for POST requests
+    if request.method == 'POST':
+        form = HabitForm(data=request.POST)
+        if form.is_valid():
+            # Create a habit without saving it to the database
+            habit = form.save(commit=False)
+            # Assign habit to the user
+            habit.user = form.get_user()
+            # Save the habit to the database
+            habit.save()
+            # Flash a success message
+            messages.success(request, "Your new habit has been added.")
+            return redirect('core:homepage')
+    # Return a blank form for other requests
+    else:
+        form = HabitForm()
+
+    # Determine which base template to extend from based on the request type
+    if request.htmx:
+        base_template = '_partial.html'
+    else:
+        base_template = '_base.html'
+
+    context = {
+        'form': form,
+        'base_template': base_template,
+    }
+    return render(request, 'core/habit.html', context)
+
+
+# Auth routes -----------------------------------
 
 
 def user_login(request):

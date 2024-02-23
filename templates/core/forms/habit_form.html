@@ -1,0 +1,20 @@
+{% extends base_template %}
+
+{% block title %}
+Habit Tracker - {{ user.first_name }} {{ user.last_name }} - Add a new habit
+{% endblock %}
+
+{% block header %}<h1>Add a new habit</h1>{% endblock %}
+
+{% block main %}
+
+<form
+  hx-post="{% url 'core:habit' %}"
+  hx-target="#content"
+  hx-swap="innerHTML"
+  hx-push-url="true">
+    {{ form.as_p }}
+    <button type=" submit">Add habit</button>
+</form>
+
+{% endblock %}
