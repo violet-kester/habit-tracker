@@ -8,8 +8,8 @@ class Profile(models.Model):
     A model class that extends Django's User model.
     Stores additional data about the user.
 
-    Has a one-to-one relationship with the User model.
-    Has a one-to-many relationship with the Habit model.
+    - Has a one-to-one relationship with the User model.
+    - Has a one-to-many relationship with the Habit model.
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -29,7 +29,7 @@ class Habit(models.Model):
     slug = models.SlugField(max_length=250,
                             unique=True)
     name = models.CharField(max_length=250)
-    description = models.TextField(blank=True),
+    description = models.TextField(blank=True)
 
     def get_absolute_url(self):
         """
