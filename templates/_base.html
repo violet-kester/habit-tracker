@@ -7,9 +7,9 @@
   <!-- Title -->
   <title>{% block title %}{% endblock %}</title>
   <!-- Favicon -->
-  <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+  <!-- <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon"> -->
   <!-- Custom stylesheet -->
-  <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+  <!-- <link href="{% static 'css/styles.css' %}" rel="stylesheet"> -->
   <!-- Htmx -->
   <script src="https://unpkg.com/htmx.org@1.9.8"
     integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr"
@@ -22,10 +22,10 @@
 
 <body hx-boost="true" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
+  <!-- {% include './core/navbar.html' %} -->
+
   <main id="content">
-    <header>
-      {% block header %}<h1>Habit Tracker</h1>{% endblock %}
-    </header>
+    <header>{% block header %}{% endblock %}</header>
     {% block main %}{% endblock %}
   </main>
 
