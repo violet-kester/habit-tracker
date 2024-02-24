@@ -166,8 +166,6 @@ def user_login(request):
 
     Context variables:
         - `form` - The AuthenticationForm instance.
-        - `base_template` - The base template to extend from,
-           depending on whether the request type is htmx or not.
     """
 
     # Authenticate and login the user for POST requests
@@ -177,21 +175,15 @@ def user_login(request):
             user = form.get_user()
             login(request, user)
             return redirect('core:homepage')
+
     # Return a blank AuthenticationForm for other requests
     else:
         form = AuthenticationForm()
 
-    # Determine which base template to extend from based on the request type
-    if request.htmx:
-        base_template = '_partial.html'
-    else:
-        base_template = '_base.html'
-
     context = {
         'form': form,
-        'base_template': base_template,
     }
-    return render(request, 'core/login.html', context)
+    return render(request, 'core/forms/login_form.html', context)
 
 
 def user_logout(request):
