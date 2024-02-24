@@ -11,6 +11,13 @@ Habit Tracker - Login
 {% block header %}<h1>Habit Tracker</h1>{% endblock %}
 
 {% block main %}
+
+{% if user.is_authenticated %}
+<button hx-get="{% url 'core:logout' %}" hx-target="#main" hx-swap="outerHTML">Log out</button>
+{% else %}
+<button hx-get="{% url 'core:login' %}" hx-no-auto-focus>Log in</button>
+{% endif %}
+
 <section>
     <h2>Progress</h2>
     <p>
