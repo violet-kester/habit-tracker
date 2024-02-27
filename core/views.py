@@ -2,9 +2,12 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 import calendar
 import datetime
+
+from django.urls import reverse
 from .models import Habit, Progress
 from .forms import HabitForm
 
@@ -14,12 +17,12 @@ def homepage(request):
     Homepage view.
 
     Context variables:
-        - `habits` - The user's Habit objects.
-        - `progress` - The user's Progress objects for the current month.
-        - `year` - The current year.
-        - `month_name` - The name of the current month.
-        - `base_template`: The base template to extend from,
-           depending on whether the request type is htmx or not.
+    - `habits` - The user's Habit objects.
+    - `progress` - The user's Progress objects for the current month.
+    - `year` - The current year.
+    - `month_name` - The name of the current month.
+    - `base_template` - The base template to extend from,
+                        depending on whether the request type is htmx or not.
     """
 
     # Get the current user, year, and month from the request
@@ -114,13 +117,14 @@ def habit(request):
     """
     Habit view.
 
-    - For POST requests, it creates a new habit.
-    - Otherwise, it renders a form for adding a new habit.
+    - For POST requests, it creates a new habit in the database and
+      returns HTML representing the new habit.
+    - For other requests, it renders a form for adding a new habit.
 
     Context variables:
-        - `form` - The AuthenticationForm instance.
-        - `base_template` - The base template to extend from,
-           depending on whether the request type is htmx or not.
+    - `form` - The AuthenticationForm instance.
+    - `base_template` - The base template to extend from,
+                        depending on whether the request type is htmx or not.
     """
 
     # Authenticate and login the user for POST requests
@@ -165,18 +169,21 @@ def user_login(request):
     - Otherwise, it renders the login page with an AuthenticationForm.
 
     Context variables:
-        - `form` - The AuthenticationForm instance.
+    - `form` - An AuthenticationForm instance.
     """
 
-    # Authenticate and login the user for POST requests
+    # For POST requests, authenticate, login, and redirect user to homepage
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('core:homepage')
+            # Redirect to the homepage
+            return HttpResponse(status=204, headers={
+                'HX-Redirect': reverse('core:homepage')
+            })
 
-    # Return a blank AuthenticationForm for other requests
+    # For other requests, render a blank AuthenticationForm
     else:
         form = AuthenticationForm()
 
@@ -189,23 +196,21 @@ def user_login(request):
 def user_logout(request):
     """
     Logout view.
+
+    - Logs the user out and redirects them to the homepage.
     """
 
     logout(request)
-    return redirect('core:homepage')
+
+    return HttpResponse(
+        status=204,
+        headers={'HX-Redirect': reverse('core:homepage')}
+    )
 
 
 def user_register(request):
     """
     Register view.
-    """
-
-    pass
-
-
-def dashboard(request):
-    """
-    Dashboard view.
     """
 
     pass
