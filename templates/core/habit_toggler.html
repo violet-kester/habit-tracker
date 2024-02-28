@@ -1,0 +1,10 @@
+<div>
+  {{ habit.name }}
+  <div
+    class="habit-toggler"
+    width="100px"
+    height="100px"
+    style="background-color:{{ current_color }}"
+    hx-get="{% url 'core:toggle_habit' habit.slug %}">
+  </div>
+</div>
