@@ -112,10 +112,13 @@ def homepage(request):
     )
 
 
+# Habit routes ----------------------------------
+
+
 @login_required
-def habit(request):
+def add_habit(request):
     """
-    Habit view.
+    Add habit view.
 
     - For POST requests, it creates a new habit in the database and
       returns HTML representing the new habit.
@@ -127,7 +130,7 @@ def habit(request):
                         depending on whether the request type is htmx or not.
     """
 
-    # Authenticate and login the user for POST requests
+    # Authenticate and login user for POST requests
     if request.method == 'POST':
         form = HabitForm(data=request.POST)
         if form.is_valid():
@@ -139,7 +142,11 @@ def habit(request):
             habit.save()
             # Flash a success message
             messages.success(request, "Your new habit has been added.")
-            return redirect('core:homepage')
+            # Redirect to the homepage
+            return HttpResponse(status=204, headers={
+                'HX-Redirect': reverse('core:homepage')
+            })
+
     # Return a blank form for other requests
     else:
         form = HabitForm()
@@ -154,7 +161,24 @@ def habit(request):
         'form': form,
         'base_template': base_template,
     }
-    return render(request, 'core/habit.html', context)
+    return render(request, 'core/habit_toggler.html', context)
+
+
+@login_required
+def toggle_habit(request, habit_slug):
+    """
+    Toggle habit view.
+
+    - Called by clicking a toggler for each habit on a single day.
+    - Updates the habit's completion status in the database.
+    - Renders a red, green, or gray toggler based on completion status.
+    """
+
+    context = {
+        'habit': habit,
+        'current_color': current_color,
+    }
+    return render(request, 'core/habit_toggler.html', context)
 
 
 # Auth routes -----------------------------------
