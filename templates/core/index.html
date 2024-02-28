@@ -12,22 +12,53 @@ Habit Tracker - Login
 
 {% block main %}
 
-<div id="login">
-    {% if user.is_authenticated %}
-    <button hx-get="{% url 'core:logout' %}">Log out</button>
-    {% else %}
-    <button hx-get="{% url 'core:login' %}" hx-target="#login" hx-swap="outerHTML">Log in</button>
-    {% endif %}
-</div>
+<!-- Navbar ------------------------------------>
+
+<nav>
+    <button
+        hx-get="{% url 'core:add_habit' %}"
+        hx-target="#content"
+        hx-swap="outerHTML"
+        hx-push-url="true">
+            + New habit
+    </button>
+
+    <div id="login">
+        {% if user.is_authenticated %}
+        <button hx-get="{% url 'core:logout' %}">Log out</button>
+        {% else %}
+        <button
+            hx-get="{% url 'core:login' %}"
+            hx-target="#login"
+            hx-swap="outerHTML">
+                Log in
+        </button>
+        {% endif %}
+    </div>
+</nav>
+
+{% if user.is_authenticated %}
+
+<!-- Today's progress -------------------------->
 
 <section>
-    <h2>Progress</h2>
+    <h2>Today</h2>
     <p>
-        Welcome{% if user.is_authenticated %}, {{ user.first_name }} {{ user.last_name }}{% endif %}.<br />
-        Here are your habits and progress for {{ month_name }} {{ year }}:
+        Welcome, {{ user.first_name }} {{ user.last_name }}.<br />
+        Here are your habits and progress for {% now "F jS, Y" %}:
     </p>
+
+</section>
+
+<!-- Calendar ---------------------------------->
+
+<section>
+    <h2>Calendar</h2>
     <div class="calendar">
         {{ html_cal|safe }}
     </div>
 </section>
+
+{% endif %}
+
 {% endblock %}
