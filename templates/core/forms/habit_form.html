@@ -9,7 +9,7 @@ Habit Tracker - {{ user.first_name }} {{ user.last_name }} - Add a new habit
 {% block main %}
 
 <form
-  hx-post="{% url 'core:habit' %}"
+  hx-post="{% url 'core:add_habit' %}"
   hx-target="#content"
   hx-swap="innerHTML"
   hx-push-url="true">
