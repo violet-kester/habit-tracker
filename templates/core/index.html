@@ -39,14 +39,19 @@ Habit Tracker - Login
 
 {% if user.is_authenticated %}
 
-<!-- Today's progress -------------------------->
+<!-- Habits and progress ----------------------->
 
 <section>
     <h2>Today</h2>
+
     <p>
         Welcome, {{ user.first_name }} {{ user.last_name }}.<br />
         Here are your habits and progress for {% now "F jS, Y" %}:
     </p>
+
+    {% for habit in user.habits.all %}
+        {{ habit.name }}
+    {% endfor %}
 
 </section>
 
