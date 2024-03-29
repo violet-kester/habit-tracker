@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 import calendar
 import datetime
@@ -26,8 +26,8 @@ def homepage(request):
 
     # Get the current user, year, and month from the request
     user = request.user
-    year = request.GET.get('year', None)
-    month = request.GET.get('month', None)
+    year = request.GET.get('year', date.today().year)
+    month = request.GET.get('month', date.today().month)
 
     # Check if the user is authenticated
     if user.is_authenticated:
@@ -87,7 +87,7 @@ def homepage(request):
     )
 
 
-# Habit routes ----------------------------------
+# Habit views -----------------------------------
 
 
 @login_required
@@ -100,7 +100,7 @@ def add_habit(request):
     - For other requests, it renders a form for adding a new habit.
 
     Context variables:
-    - `form` - The AuthenticationForm instance.
+    - `form` - The HabitForm instance.
     - `base_template` - The base template to extend from,
                         depending on whether the request type is htmx or not.
     """
@@ -112,7 +112,7 @@ def add_habit(request):
             # Create a habit without saving it to the database
             habit = form.save(commit=False)
             # Assign habit to the user
-            habit.user = form.get_user()
+            habit.user = request.user
             # Save the habit to the database
             habit.save()
             # Flash a success message
@@ -136,7 +136,7 @@ def add_habit(request):
         'form': form,
         'base_template': base_template,
     }
-    return render(request, 'core/habit_toggler.html', context)
+    return render(request, 'core/forms/habit_form.html', context)
 
 
 @login_required
@@ -148,6 +148,9 @@ def toggle_habit(request, habit_slug):
     - Updates the habit's completion status in the database.
     - Renders a red, green, or gray toggler based on completion status.
     """
+
+    habit = get_object_or_404(Habit, slug=habit_slug)
+    current_color = "red"
 
     context = {
         'habit': habit,
