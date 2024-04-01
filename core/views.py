@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 import calendar
 import datetime
-from datetime import date
+from datetime import date, timezone
 from .models import Habit, Progress
 from .forms import HabitForm
 
@@ -146,11 +146,12 @@ def toggle_habit(request, habit_slug):
 
     - Called by clicking a toggler for each habit on a single day.
     - Updates the habit's completion status in the database.
-    - Renders a red, green, or gray toggler based on completion status.
+    - Renders a toggler with an updated bg color based on completion status.
     """
 
     habit = get_object_or_404(Habit, slug=habit_slug)
-    current_color = "red"
+    # Use date specified in URL parameter or today's date by default
+    date = request.GET.get('date') or timezone.now().date()
 
     context = {
         'habit': habit,
