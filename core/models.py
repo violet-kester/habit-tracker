@@ -20,6 +20,7 @@ class Habit(models.Model):
     """
     A model class that represents a habit to track.
 
+    - Has a many-to-one relationship with the User model.
     - Has a one-to-many relationship with the Progress model.
     """
 
@@ -30,6 +31,8 @@ class Habit(models.Model):
                             unique=True)
     name = models.CharField(max_length=250)
     description = models.TextField(blank=True)
+    # Number of times/week. 7 = everyday, 1 = once a week.
+    weekly_rate = models.IntegerField(blank=True, default=7)
 
     def get_absolute_url(self):
         """
@@ -54,13 +57,23 @@ class Progress(models.Model):
     """
     A model class that represents the completion status of a habit on a date.
 
-    - Stores the completion status as a boolean value.
+    - Stores a habit's completion status on a given date as a boolean value.
+    - Stores a color value for each date used to visually represent
+      completion status in the DOM (e.g. in the calendar).
     - Has a many-to-one relationship with the Habit model.
     """
 
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     completed = models.BooleanField(default=False)
+    # TODO: Implement logic for color selection
+    color = models.CharField(default='gray')
+    # Is the number of Progress.completed for this habit for this week > weekly_rate?
+    # If so, set color to gold
+    # Is Progress.completed True for today?
+    # If so, set color to green
+    # Is the specified date in the past and Progress.complete False?
+    # If so, set the color to red
 
     def __str__(self):
         return f'{self.habit.name} - {self.date}'
