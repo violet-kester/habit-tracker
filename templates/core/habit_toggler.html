@@ -1,14 +1,21 @@
 <!--
-  Clicking this toggler marks a habit as complete on a given day
+  Habit toggler template
+
+  Clicking this toggler updates a habit's completion status on a given day.
+
+  - Used to a form a 3x3 toggleboard that represents 9 habits tracked
+    by the user.
+  - In the habit page template, togglers are used to represent days in a month
+    on a calendar.
 -->
 
 <div>
-  {{ habit.name }}
   <div
-    class="habit-toggler"
-    width="100px"
-    height="100px"
-    style="background-color:{{ current_color }}"
-    hx-get="{% url 'core:toggle_habit' habit.slug %}">
+  class="habit-toggler"
+  width="100px"
+  height="100px"
+  style="background-color: {{ progress.color }}"
+  hx-get="{% url 'core:toggle_habit' habit.slug date %}">
+    {{ habit.name }}
   </div>
 </div>

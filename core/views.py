@@ -140,22 +140,35 @@ def add_habit(request):
 
 
 @login_required
-def toggle_habit(request, habit_slug):
+def toggle_habit(request, habit_slug, date=timezone.now().date()):
     """
     Toggle habit view.
 
     - Called by clicking a toggler for each habit on a single day.
     - Updates the habit's completion status in the database.
-    - Renders a toggler with an updated bg color based on completion status.
+    - Renders a toggler with an updated background color
+      based on completion status (white, gray, red, green, or gold).
+
+    Context:
+    - `habit` - The Habit object retrieved based on the provided slug.
+                Contains habit meta data, stats, etc.
+    - `progress` - Contains data related to a habit's completion status on
+                   the provided date, including the color used
+                   to render the template background in the DOM.
     """
 
     habit = get_object_or_404(Habit, slug=habit_slug)
-    # Use date specified in URL parameter or today's date by default
-    date = request.GET.get('date') or timezone.now().date()
+
+    # Retrieve the Progress object related to the habit and date
+    try:
+        progress = habit.Progress.get(date=date)
+    # Create a new Progress instance if it doesn't exist for this date
+    except Progress.DoesNotExist:
+        progress = Progress.objects.create(habit=habit, date=date)
 
     context = {
         'habit': habit,
-        'current_color': current_color,
+        'progress': progress,
     }
     return render(request, 'core/habit_toggler.html', context)
 
