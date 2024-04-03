@@ -8,7 +8,7 @@ from django.urls import reverse
 from datetime import date, timezone
 from .models import Habit, Progress
 from .forms import HabitForm
-from .calendars import CustomHTMLCalendar
+from .calendars import CustomHTMLCalendar, HabitHTMLCalendar
 
 
 def homepage(request):
@@ -77,11 +77,19 @@ def habit(request, habit_slug):
 
     Context:
     - `habit` - The Habit object. Contains habit meta data, stats, etc.
-    - `habit_calendar` - A color-coded HTMLCalendar instance reflecting
+    - `html_calendar` - A HabitHTMLCalendar instance reflecting
                          the user's progress for this habit over time.
     - `base_template` - The base template to extend from,
                         depending on whether the request type is htmx or not.
     """
+
+    # Get the habit, year, and month from the request
+    habit = get_object_or_404(Habit, slug=habit_slug)
+    year = request.GET.get('year', date.today().year)
+    month = request.GET.get('month', date.today().month)
+
+    # Create an instance of HabitHTMLCalendar and format it
+    html_calendar = HabitHTMLCalendar().formatmonth(year, month)
 
     # Determine which base template to extend from based on the request type
     if request.htmx:
