@@ -31,7 +31,7 @@ class Habit(models.Model):
                             unique=True)
     name = models.CharField(max_length=250)
     description = models.TextField(blank=True)
-    # Number of times/week. 7 = everyday, 1 = once a week.
+    # Target number of times/week. 7 = everyday, 1 = once a week.
     weekly_rate = models.IntegerField(blank=True, default=7)
 
     def get_absolute_url(self):
@@ -50,7 +50,7 @@ class Habit(models.Model):
                        args=[self.slug])
 
     def __str__(self):
-        return self.name
+        return f'Habit: {self.name}'
 
 
 class Progress(models.Model):
@@ -58,9 +58,18 @@ class Progress(models.Model):
     A model class that represents the completion status of a habit on a date.
 
     - Stores a habit's completion status on a given date as a boolean value.
-    - Stores a color value for each date used to visually represent
-      completion status in the DOM (e.g. in the calendar).
-    - Has a many-to-one relationship with the Habit model.
+    - Stores a corresponding color value used to visually represent
+      completion status in the DOM (e.g. in calendars, togglers).
+    - Has a many-to-one relationship with the Habit model, one instance for
+      each day.
+
+    Color values:
+
+    - 'white' - Incomplete
+    - 'red' - Missed/incomplete
+    - 'green' - Completed
+    - 'gold' - Completed for the week
+    - 'gray' - Paused/unavailable
     """
 
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE)
@@ -76,4 +85,4 @@ class Progress(models.Model):
     # If so, set the color to red
 
     def __str__(self):
-        return f'{self.habit.name} - {self.date}'
+        return f'Progress: {self.habit.name} - {self.date}'
