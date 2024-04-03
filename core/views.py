@@ -5,21 +5,22 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-import calendar
-import datetime
 from datetime import date, timezone
 from .models import Habit, Progress
 from .forms import HabitForm
+from .calendars import CustomHTMLCalendar
 
 
 def homepage(request):
     """
     Homepage view.
 
+    From the homepage, users can click on links
+
     Context variables:
     - `habits` - The user's Habit objects.
     - `progress` - The user's Progress objects for the current day.
-    - `html_cal` - An instance of HTMLCalendar for rendering the calendar.
+    - `html_calendar` - An instance of CustomHTMLCalendar.
     - `base_template` - The base template to extend from,
                         depending on whether the request type is htmx or not.
     """
@@ -44,29 +45,8 @@ def homepage(request):
         habits = []
         progress = []
 
-    # Write a custom formatday method for adding custom styling to the calendar
-    def formatday(day, weekday):
-        # If the day is zero, return an empty cell
-        if day == 0:
-            return '<td class="noday">&nbsp;</td>'
-        # Create a date object for the day
-        date = datetime.date(year, month, day)
-        # Check if the date is today
-        is_today = date == datetime.date.today()
-        # Create a CSS class for the date cell based on the conditions
-        if is_today:
-            css_class = "cal-today"
-        else:
-            css_class = "cal-not-today"
-        # Return the HTML code for the date cell with the habit names
-        return f'<td class="{css_class}">{day}</td>'
-
-    # Create an HTMLCalendar instance
-    cal = calendar.HTMLCalendar()
-    # Override the default formatday method on the HTMLCalendar instance
-    cal.formatday = formatday
-    # Format the entire month as an HTML table
-    html_cal = cal.formatmonth(year, month)
+    # Create an instance of CustomHTMLCalendar and format it
+    html_calendar = CustomHTMLCalendar().formatmonth(year, month)
 
     # Determine which base template to extend from based on the request type
     if request.htmx:
@@ -77,7 +57,7 @@ def homepage(request):
     context = {
         'habits': habits,
         'progress': progress,
-        'html_cal': html_cal,
+        'html_calendar': html_calendar,
         'base_template': base_template
     }
     return render(
@@ -88,6 +68,32 @@ def homepage(request):
 
 
 # Habit views -----------------------------------
+
+
+@login_required
+def habit(request, habit_slug):
+    """
+    Habit page view.
+
+    Context:
+    - `habit` - The Habit object. Contains habit meta data, stats, etc.
+    - `habit_calendar` - A color-coded HTMLCalendar instance reflecting
+                         the user's progress for this habit over time.
+    - `base_template` - The base template to extend from,
+                        depending on whether the request type is htmx or not.
+    """
+
+    # Determine which base template to extend from based on the request type
+    if request.htmx:
+        base_template = '_partial.html'
+    else:
+        base_template = '_base.html'
+
+    context = {
+        'html_calendar': html_calendar,
+        'base_template': base_template,
+    }
+    return render(request, 'core/habit.html', context)
 
 
 @login_required
@@ -140,7 +146,7 @@ def add_habit(request):
 
 
 @login_required
-def toggle_habit(request, habit_slug, date=timezone.now().date()):
+def toggle_habit(request, habit_slug, date=None):
     """
     Toggle habit view.
 
@@ -150,19 +156,19 @@ def toggle_habit(request, habit_slug, date=timezone.now().date()):
       based on completion status (white, gray, red, green, or gold).
 
     Context:
-    - `habit` - The Habit object retrieved based on the provided slug.
-                Contains habit meta data, stats, etc.
-    - `progress` - Contains data related to a habit's completion status on
+    - `habit` - The Habit object. Contains habit meta data, stats, etc.
+    - `progress` - Contains data related to the habit's completion status on
                    the provided date, including the color used
                    to render the template background in the DOM.
     """
 
     habit = get_object_or_404(Habit, slug=habit_slug)
+    date = date or timezone.now().date()
 
     # Retrieve the Progress object related to the habit and date
     try:
         progress = habit.Progress.get(date=date)
-    # Create a new Progress instance if it doesn't exist for this date
+    # Or create a new Progress instance if it doesn't exist for this date
     except Progress.DoesNotExist:
         progress = Progress.objects.create(habit=habit, date=date)
 
