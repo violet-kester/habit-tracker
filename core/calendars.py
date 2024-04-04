@@ -30,7 +30,7 @@ class CustomHTMLCalendar(calendar.HTMLCalendar):
     def formatmonthname(self, year, month, withyear=True):
         """
         Overrides the parent class's `formatmonthname()` method in order to
-        add a custom class name `.month-header` to month header row
+        add a custom class name `.month-header` to the month header row
         for styling purposes.
         """
 
@@ -42,8 +42,7 @@ class CustomHTMLCalendar(calendar.HTMLCalendar):
     def formatday(self, day, weekday):
         """
         Overrides the parent class's `formatday()` method in order to
-        add a custom class `.today` to the cell of today's date
-        for styling purposes.
+        add a custom class `.today` to today's date cell for styling purposes.
         """
 
         # If the current day of the month being formatted is a "padding day",
@@ -76,8 +75,8 @@ class HabitHTMLCalendar(CustomHTMLCalendar):
     def formatday(self, day, weekday):
         """
         Overrides the parent class's `formatday()` method in order to
-        include togglers for updating completion status inside each day's cell.
-        It also maintains the highlighting of today's date.
+        include togglers for updating completion status
+        inside each day's table cell.
         """
 
         # Call the `formatday()` method of the superclass `CustomHTMLCalendar`

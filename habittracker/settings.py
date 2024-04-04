@@ -106,13 +106,17 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
+# Default time zone for the project
 TIME_ZONE = 'UTC'
 
-USE_I18N = True
-
+# Enables time-zone-aware datetimes
 USE_TZ = True
+
+# Default language code
+LANGUAGE_CODE = 'en-us'
+
+# Enables Django's translation system
+USE_I18N = True
 
 
 # Static files
