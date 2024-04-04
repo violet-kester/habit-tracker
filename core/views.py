@@ -15,7 +15,10 @@ def homepage(request):
     """
     Homepage view.
 
-    From the homepage, users can click on links
+    From the homepage, users can:
+    - Update their habits' completion status in the toggleboard.
+    - Click on links to view/edit data related to individual habits.
+    - View their overall progress across time using the master calendar.
 
     Context variables:
     - `habits` - The user's Habit objects.
@@ -77,7 +80,7 @@ def habit(request, habit_slug):
 
     Context:
     - `habit` - The Habit object. Contains habit meta data, stats, etc.
-    - `html_calendar` - A HabitHTMLCalendar instance reflecting
+    - `html_calendar` - An instance of HabitHTMLCalendar, reflects
                          the user's progress for this habit over time.
     - `base_template` - The base template to extend from,
                         depending on whether the request type is htmx or not.
@@ -98,6 +101,7 @@ def habit(request, habit_slug):
         base_template = '_base.html'
 
     context = {
+        'habit': habit,
         'html_calendar': html_calendar,
         'base_template': base_template,
     }
@@ -119,7 +123,8 @@ def add_habit(request):
                         depending on whether the request type is htmx or not.
     """
 
-    # Authenticate and login user for POST requests
+    # For POST requests:
+    # Create a new habit, save it to the database, and redirect home
     if request.method == 'POST':
         form = HabitForm(data=request.POST)
         if form.is_valid():
@@ -136,7 +141,7 @@ def add_habit(request):
                 'HX-Redirect': reverse('core:homepage')
             })
 
-    # Return a blank form for other requests
+    # For other requests, return a blank form
     else:
         form = HabitForm()
 
@@ -196,13 +201,14 @@ def user_login(request):
 
     - For POST requests, it authenticates and logs in the user,
       then redirects them to the homepage.
-    - Otherwise, it renders the login page with an AuthenticationForm.
+    - For other requests, it renders the login page with an AuthenticationForm.
 
     Context variables:
     - `form` - An AuthenticationForm instance.
     """
 
-    # For POST requests, authenticate, login, and redirect user to homepage
+    # For POST requests:
+    # Authenticate, login, and redirect user to homepage
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
